@@ -287,7 +287,19 @@
     return "";
   }
 
+  // Mindestens eine Nacht: Abreisetage bis zur Anreise sind gesperrt. Liegt die gewählte Abreise
+  // nicht mehr nach der Anreise, rückt sie auf den nächsten möglichen Tag.
+  function abreiseAbgleichen() {
+    const optionen = [...abreisetag.options];
+    optionen.forEach(o => { o.disabled = o.value <= anreisetag.value; });
+    if (abreisetag.value <= anreisetag.value) {
+      const naechster = optionen.find(o => !o.disabled);
+      if (naechster) abreisetag.value = naechster.value;
+    }
+  }
+
   function rechnen() {
+    abreiseAbgleichen();
     const e = eingabe();
     document.getElementById("dabei").hidden = e.teilnahme !== 1;
     document.getElementById("partner-feld").hidden = e.zimmer !== "Doppelzimmer";

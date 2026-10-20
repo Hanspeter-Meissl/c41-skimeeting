@@ -60,6 +60,11 @@
   .option:has(input:checked) { border: 2px solid var(--navy); padding: 13px; background: var(--hell); }
   .option select { font: inherit; font-size: 16px; height: 36px; padding: 2px 6px; margin: 0 4px; border: 1px solid var(--linie); border-radius: 6px; background: #fff; color: var(--ink); }
   .option .platz { font-size: 15px; color: var(--ink); grid-column: 2; }
+  .tage { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0 4px; }
+  .tag-feld { display: grid; gap: 4px; font-size: 14px; font-weight: 700; color: var(--navy); min-width: 0; }
+  .tag-feld select { font: inherit; font-weight: 400; font-size: 16px; height: 44px; padding: 4px 8px; width: 100%;
+                     border: 1px solid var(--linie); border-radius: 8px; background: #fff; color: var(--ink); }
+  @media (max-width: 360px) { .tage { grid-template-columns: 1fr; } }
 
   label.feld { display: block; font-weight: 700; color: var(--navy); margin: 18px 0 6px; }
   label.feld span { font-weight: 400; color: var(--grau); font-size: 14px; }
@@ -131,6 +136,24 @@
   </div>
 
   <div id="dabei" hidden>
+    <h3>Aufenthalt</h3>
+    <p class="frage-zusatz">Wann reist du an und wann wieder ab?</p>
+    <div class="tage">
+      <label class="tag-feld">Anreise am
+        <select id="anreisetag">
+          <option value="2027-01-10" selected>So, 10. Jänner</option>
+          <option value="2027-01-11">Mo, 11. Jänner</option>
+          <option value="2027-01-12">Di, 12. Jänner</option>
+        </select></label>
+      <label class="tag-feld">Abreise am
+        <select id="abreisetag">
+          <option value="2027-01-11">Mo, 11. Jänner</option>
+          <option value="2027-01-12">Di, 12. Jänner</option>
+          <option value="2027-01-13" selected>Mi, 13. Jänner</option>
+        </select></label>
+    </div>
+    <p class="frage-zusatz" id="naechte"></p>
+
     <h3>Zimmerwunsch</h3>
     <p class="frage-zusatz">Wir berücksichtigen deinen Wunsch je nach Verfügbarkeit.</p>
     <div class="wahl" role="radiogroup" aria-label="Zimmerwunsch">
@@ -144,9 +167,9 @@
       <input class="text" id="partner" maxlength="80" autocomplete="off">
     </div>
 
-    <h3>Anreise</h3>
+    <h3>Mitfahrgelegenheit</h3>
     <p class="frage-zusatz">Damit wir Fahrgemeinschaften bilden können.</p>
-    <div class="wahl" role="radiogroup" aria-label="Anreise">
+    <div class="wahl" role="radiogroup" aria-label="Mitfahrgelegenheit">
       <label class="option"><input type="radio" name="anreise" value="fahre selbst">
         <span class="titel">Ich fahre selbst</span><span class="preis"></span>
         <span class="platz">und habe Platz für <select id="plaetze" aria-label="Freie Plätze">
@@ -220,6 +243,8 @@
   const wert = liste => (liste.find(o => o.checked) || {}).value ?? null;
   const setzen = (liste, w) => liste.forEach(o => { o.checked = o.value === w; });
   const partner = document.getElementById("partner");
+  const anreisetag = document.getElementById("anreisetag");
+  const abreisetag = document.getElementById("abreisetag");
   const plaetzeFeld = document.getElementById("plaetze");
   const anmerkung = document.getElementById("anmerkung");
 
@@ -231,7 +256,7 @@
     const hinweis = document.getElementById("bestand");
     hinweis.textContent = bestand === "0"
       ? "Laut unserer Liste bist du diesmal nicht dabei."
-      : "Laut unserer Liste bist du angemeldet. Bitte ergänze noch deinen Zimmerwunsch und deine Anreise und schick die Anmeldung ab.";
+      : "Laut unserer Liste bist du angemeldet. Bitte ergänze noch Aufenthalt, Zimmerwunsch und Mitfahrgelegenheit und schick die Anmeldung ab.";
     hinweis.hidden = false;
   }
 
@@ -244,6 +269,7 @@
     const anreise = dabei ? wert(anreiseWahl) : null;
     return {
       teilnahme, zimmer, anreise,
+      von: dabei ? anreisetag.value : "", bis: dabei ? abreisetag.value : "",
       partner: zimmer === "Doppelzimmer" ? partner.value.trim() : "",
       plaetze: anreise === SELBST && plaetzeFeld.value !== "" ? Number(plaetzeFeld.value) : null,
       anmerkung: anmerkung.value.trim(),
@@ -254,8 +280,9 @@
   function fehlt(e) {
     if (e.teilnahme === null) return "";
     if (e.teilnahme === 0) return "";
+    if (naechte(e.von, e.bis) === null) return "Bitte wähle eine Abreise nach der Anreise.";
     if (!e.zimmer) return "Bitte wähle deinen Zimmerwunsch.";
-    if (!e.anreise) return "Bitte wähle deine Anreise.";
+    if (!e.anreise) return "Bitte wähle deine Mitfahrgelegenheit.";
     if (e.anreise === SELBST && e.plaetze === null) return "Bitte wähle, für wie viele Personen du im Auto Platz hast.";
     return "";
   }
@@ -267,14 +294,18 @@
     document.getElementById("summe").textContent = euro(anmeldung(e.teilnahme ?? -1).betrag);
     const text = fehlt(e);
     const hinweis = document.getElementById("hinweis");
-    // Den Hinweis erst zeigen, wenn schon ein Teil der Fragen beantwortet ist.
-    hinweis.hidden = !text || (!e.zimmer && !e.anreise);
+    // Den Hinweis erst zeigen, wenn schon ein Teil der Fragen beantwortet ist; einen unmöglichen Aufenthalt sofort.
+    const n = naechte(e.von, e.bis);
+    hinweis.hidden = !text || (!e.zimmer && !e.anreise && n !== null);
+    document.getElementById("naechte").textContent = n === null ? "" : `${n} ${n === 1 ? "Nacht" : "Nächte"}`;
     hinweis.textContent = text;
     document.getElementById("los").disabled = e.teilnahme === null || !!text;
     return e;
   }
   [...teilnahmeWahl, ...zimmerWahl, ...anreiseWahl].forEach(o => { o.onchange = rechnen; });
   // Wer die Zahl der Plätze wählt, fährt selbst.
+  anreisetag.onchange = rechnen;
+  abreisetag.onchange = rechnen;
   plaetzeFeld.onchange = () => { if (plaetzeFeld.value !== "") setzen(anreiseWahl, SELBST); rechnen(); };
   partner.oninput = rechnen;
 
@@ -292,6 +323,8 @@
       setzen(zimmerWahl, g.zimmer);
       setzen(anreiseWahl, g.anreise);
       partner.value = g.partner || "";
+      if (g.von) anreisetag.value = g.von;
+      if (g.bis) abreisetag.value = g.bis;
       plaetzeFeld.value = g.plaetze === null || g.plaetze === undefined ? "" : String(g.plaetze);
       anmerkung.value = g.anmerkung || "";
     } catch (x) {}
@@ -305,6 +338,10 @@
     window.scrollTo(0, 0);
   }
 
+  const aufenthaltText = e => {
+    const n = naechte(e.von, e.bis);
+    return `${TAGNAME[e.von]} bis ${TAGNAME[e.bis]}, ${n} ${n === 1 ? "Nacht" : "Nächte"}`;
+  };
   const zimmerText = e => e.zimmer === "Doppelzimmer" && e.partner ? `Doppelzimmer mit ${e.partner}` : e.zimmer;
   const anreiseText = e => e.anreise === SELBST
     ? `Ich fahre selbst und habe Platz für ${e.plaetze} ${e.plaetze === 1 ? "Person" : "Personen"}.`
@@ -326,15 +363,17 @@
       return;
     }
     zeile([el("div", "name", "Ich nehme teil"), el("div", "weg", anzeigename || vorname)], "");
+    zeile([el("div", "name", "Aufenthalt"), el("div", "weg", aufenthaltText(e))], "");
     zeile([el("div", "name", zimmerText(e)), el("div", "weg", "Zimmerwunsch, je nach Verfügbarkeit")], "");
-    zeile([el("div", "name", "Anreise"), el("div", "weg", anreiseText(e))], "");
+    zeile([el("div", "name", "Mitfahrgelegenheit"), el("div", "weg", anreiseText(e))], "");
     zeile([el("span", "", "Vorauszahlung")], euro(anmeldung(1).betrag), "gesamt");
   }
 
   // Text für die Spalte Vorauszahlung und die Ersatzmail.
   function zusammenfassung(e) {
     if (!e.teilnahme) return "nehme nicht teil";
-    return `nehme teil, Zimmerwunsch: ${zimmerText(e)}, Anreise: ${anreiseText(e)} Vorauszahlung ${euro(anmeldung(1).betrag)}`;
+    return `nehme teil, Aufenthalt: ${aufenthaltText(e)}, Zimmerwunsch: ${zimmerText(e)}, `
+         + `Mitfahrgelegenheit: ${anreiseText(e)} Vorauszahlung ${euro(anmeldung(1).betrag)}`;
   }
 
   let entwurf = null;  // die Anmeldung, die gerade geprüft wird
@@ -377,7 +416,8 @@
     knopf.classList.add("sendet");
     knopf.textContent = "Wird gesendet …";
     document.getElementById("fehler").hidden = true;
-    const daten = { mitglied, teilnahme: entwurf.teilnahme, zimmer: entwurf.zimmer || "", partner: entwurf.partner,
+    const daten = { mitglied, teilnahme: entwurf.teilnahme, anreisetag: entwurf.von, abreisetag: entwurf.bis,
+                    zimmer: entwurf.zimmer || "", partner: entwurf.partner,
                     anreise: entwurf.anreise || "", plaetze: entwurf.plaetze ?? "",
                     vorauszahlung: zusammenfassung(entwurf), anmerkung: entwurf.anmerkung };
     const abbruch = new AbortController();

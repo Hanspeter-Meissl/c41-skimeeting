@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Skimeeting Flachau · Club 41</title>
+<meta name="description" content="Dein persönlicher Anmeldelink für das Skimeeting in Flachau, 10. bis 13. Jänner 2027. Anmeldeschluss 28. November 2026.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="de_AT">
+<meta property="og:site_name" content="Club 41 Grieskirchen-Hausruck">
+<meta property="og:title" content="Skimeeting in Flachau · Club 41">
+<meta property="og:description" content="Dein persönlicher Anmeldelink für das Skimeeting, 10. bis 13. Jänner 2027, Quartier Reslwirt. Anmeldeschluss 28. November 2026.">
+<meta property="og:url" content="https://hanspeter-meissl.github.io/c41-skimeeting/">
+<meta property="og:image" content="https://hanspeter-meissl.github.io/c41-skimeeting/bilder/vorschau.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Skimeeting in Flachau, 10. bis 13. Jänner 2027">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    --navy: #1F3864; --gold: #C0975B; --ink: #1D2733; --grau: #6B7683;
+    --linie: #DCE1E8; --hell: #F4F6F9; --warn: #9A3412; --warn-hell: #FFF4E5;
+    --rand: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #fff; color: var(--ink);
+    font: 16px/1.5 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  }
+  main { max-width: 640px; margin: 0 auto; padding: 0 var(--rand) 40px; }
+  header { display: flex; align-items: center; gap: 12px; padding: 16px 0 12px; border-bottom: 3px solid var(--navy); }
+  header img { width: 48px; height: 48px; }
+  header .club { font-weight: 700; color: var(--navy); line-height: 1.2; }
+  header .jahr { font-size: 12px; letter-spacing: .12em; color: var(--gold); font-weight: 700; }
+  h1 { font: 400 30px/1.2 Georgia, serif; color: var(--navy); margin: 22px 0 6px; }
+  .anrede { font-size: 18px; margin: 4px 0 6px; }
+  .anrede b { color: var(--navy); }
+  .fuer { color: var(--grau); margin: 0 0 14px; font-size: 14px; }
+  .fuer b { color: var(--navy); }
+  .titelbild { width: 100%; border-radius: 6px; display: block; margin: 8px 0 14px; }
+  p { margin: 0 0 12px; }
+  .regel { background: var(--hell); border-top: 3px solid var(--gold); padding: 12px 14px; font-size: 14px; margin: 16px 0 20px; }
+  .regel p { margin: 0 0 6px; } .regel p:last-child { margin: 0; }
+
+  .eckdaten { width: 100%; border-collapse: collapse; border-top: 3px solid var(--gold); margin: 6px 0 4px; }
+  .eckdaten th, .eckdaten td { text-align: left; padding: 9px 0; border-bottom: 1px solid var(--linie); vertical-align: top; font-size: 15px; }
+  .eckdaten th { color: var(--navy); width: 34%; padding-right: 10px; }
+
+  h2 { font: 400 24px/1.25 Georgia, serif; color: var(--navy); margin: 24px 0 6px; }
+  h3 { font-size: 17px; color: var(--navy); margin: 22px 0 2px; }
+  .frage-zusatz { font-size: 14px; color: var(--grau); margin: 0 0 4px; }
+  .wahl { display: grid; gap: 10px; margin: 10px 0 4px; }
+  .option { display: grid; grid-template-columns: 26px 1fr auto; gap: 2px 10px; align-items: center;
+            padding: 14px; border: 1px solid var(--linie); border-radius: 8px; cursor: pointer; background: #fff; }
+  .option input[type=radio] { width: 20px; height: 20px; margin: 0; accent-color: var(--navy); grid-row: span 2; }
+  .option .titel { font-weight: 700; color: var(--navy); font-size: 17px; }
+  .option .zusatz { font-size: 13px; color: var(--grau); grid-column: 2; }
+  .option .preis { font-weight: 700; color: var(--navy); font-variant-numeric: tabular-nums; grid-row: span 2; grid-column: 3; grid-row-start: 1; }
+  .option:has(input:checked) { border: 2px solid var(--navy); padding: 13px; background: var(--hell); }
+  .option select { font: inherit; font-size: 16px; height: 36px; padding: 2px 6px; margin: 0 4px; border: 1px solid var(--linie); border-radius: 6px; background: #fff; color: var(--ink); }
+  .option .platz { font-size: 15px; color: var(--ink); grid-column: 2; }
+
+  label.feld { display: block; font-weight: 700; color: var(--navy); margin: 18px 0 6px; }
+  label.feld span { font-weight: 400; color: var(--grau); font-size: 14px; }
+  input.text { width: 100%; height: 42px; padding: 8px 10px; border: 1px solid var(--linie); border-radius: 6px; font: inherit; }
+  textarea { width: 100%; min-height: 70px; padding: 8px 10px; border: 1px solid var(--linie); border-radius: 6px; font: inherit; }
+
+  .summe { display: flex; justify-content: space-between; align-items: baseline; padding: 16px 0 6px;
+           border-top: 3px solid var(--navy); margin-top: 18px; }
+  .summe .text { font-weight: 700; color: var(--navy); }
+  .summe .wert { font-size: 24px; font-weight: 700; color: var(--navy); font-variant-numeric: tabular-nums; }
+  .hinweis { background: var(--warn-hell); color: var(--warn); padding: 10px 12px; border-radius: 6px; font-size: 14px; margin: 8px 0; }
+  [hidden] { display: none !important; }
+
+  .los { display: block; width: 100%; margin: 18px 0 8px; padding: 14px; border: 0; border-radius: 6px;
+         background: var(--navy); color: #fff; font-family: inherit; font-size: 17px; font-weight: 700; cursor: pointer; }
+  .los:disabled { background: #A9B3C1; cursor: not-allowed; }
+  .naechst { font-size: 14px; color: var(--grau); }
+  .nichts { display: inline-block; margin-top: 14px; color: var(--navy); font-size: 14px; }
+  .fuer2 { color: var(--grau); margin: 0 0 12px; font-size: 14px; }
+  .bestand { background: var(--hell); border-left: 3px solid var(--gold); padding: 10px 12px; font-size: 15px; margin: 4px 0 12px; }
+  .liste { width: 100%; border-collapse: collapse; border-top: 3px solid var(--gold); margin: 6px 0 12px; }
+  .liste td { padding: 10px 0; border-bottom: 1px solid var(--linie); vertical-align: top; }
+  .liste td.betrag { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--navy); padding-left: 12px; }
+  .liste .name { font-weight: 700; color: var(--navy); }
+  .liste .weg { font-size: 13px; color: var(--grau); }
+  .liste tr.gesamt td { border-top: 3px solid var(--navy); border-bottom: 0; font-size: 18px; font-weight: 700; color: var(--navy); }
+  .anm-anzeige { font-size: 14px; color: var(--grau); background: var(--hell); padding: 10px 12px; border-radius: 6px; }
+  .zurueck { display: block; width: 100%; margin: 0 0 8px; padding: 13px; border: 1px solid var(--navy); border-radius: 6px;
+             background: #fff; color: var(--navy); font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .los.sendet { background: #A9B3C1; cursor: progress; }
+  footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--linie); font-size: 13px; color: var(--grau); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="bilder/logo.jpg" alt="Wappen Club 41">
+    <div><div class="club">Club 41 Grieskirchen-Hausruck</div><div class="jahr">CLUBJAHR 2026 / 2027</div></div>
+  </header>
+
+  <h1>Skimeeting in Flachau</h1>
+  <p class="anrede" id="anrede" hidden></p>
+  <p class="fuer" id="fuer" hidden>Anmeldung für <b id="mitglied"></b></p>
+  <div id="einleitung">
+  <img class="titelbild" src="bilder/vorschau.jpg" alt="Skimeeting in Flachau, 10. bis 13. Jänner 2027">
+  <p>Von Sonntag, 10., bis Mittwoch, 13. Jänner 2027, fahren wir gemeinsam zum Skifahren nach Flachau.</p>
+
+  <table class="eckdaten">
+    <tr><th>Termin</th><td>Sonntag, 10. Jänner, bis Mittwoch, 13. Jänner 2027</td></tr>
+    <tr><th>Ort</th><td>Flachau</td></tr>
+    <tr><th>Quartier</th><td>Reslwirt in Flachau</td></tr>
+    <tr><th>Vorauszahlung</th><td>200 € je Teilnehmer</td></tr>
+  </table>
+
+  <div class="regel">
+    <p>Die Vorauszahlung beträgt 200 € je Teilnehmer. Christian bucht sie nach dem Anmeldeschluss ab.</p>
+    <p>Anmeldeschluss ist Samstag, 28. November 2026. Bis dahin kannst du deine Anmeldung über deinen Link ändern, es gilt die letzte. Danach melde dich bitte direkt bei Hanspeter.</p>
+  </div>
+  </div>
+
+  <section id="schritt-anmelden">
+  <h2>Deine Anmeldung</h2>
+  <p class="bestand" id="bestand" hidden></p>
+  <div class="wahl" role="radiogroup" aria-label="Teilnahme">
+    <label class="option"><input type="radio" name="teilnahme" value="1">
+      <span class="titel">Ich nehme teil</span><span class="preis">200 €</span><span class="zusatz">Ich bin beim Skimeeting dabei.</span></label>
+    <label class="option"><input type="radio" name="teilnahme" value="0">
+      <span class="titel">Ich nehme nicht teil</span><span class="preis"></span><span class="zusatz">Ich bin diesmal nicht dabei.</span></label>
+  </div>
+
+  <div id="dabei" hidden>
+    <h3>Zimmerwunsch</h3>
+    <p class="frage-zusatz">Wir berücksichtigen deinen Wunsch je nach Verfügbarkeit.</p>
+    <div class="wahl" role="radiogroup" aria-label="Zimmerwunsch">
+      <label class="option"><input type="radio" name="zimmer" value="Einzelzimmer">
+        <span class="titel">Einzelzimmer</span><span class="preis"></span><span class="zusatz">Ich möchte ein Zimmer für mich allein.</span></label>
+      <label class="option"><input type="radio" name="zimmer" value="Doppelzimmer">
+        <span class="titel">Doppelzimmer</span><span class="preis"></span><span class="zusatz">Ich teile mir ein Zimmer mit einem anderen Mitglied.</span></label>
+    </div>
+    <div id="partner-feld" hidden>
+      <label class="feld" for="partner">Mit wem möchtest du das Zimmer teilen? <span>(freiwillig)</span></label>
+      <input class="text" id="partner" maxlength="80" autocomplete="off">
+    </div>
+
+    <h3>Anreise</h3>
+    <p class="frage-zusatz">Damit wir Fahrgemeinschaften bilden können.</p>
+    <div class="wahl" role="radiogroup" aria-label="Anreise">
+      <label class="option"><input type="radio" name="anreise" value="fahre selbst">
+        <span class="titel">Ich fahre selbst</span><span class="preis"></span>
+        <span class="platz">und habe Platz für <select id="plaetze" aria-label="Freie Plätze">
+          <option value="">?</option><option>0</option><option>1</option><option>2</option><option>3</option>
+          <option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+        </select> Personen</span></label>
+      <label class="option"><input type="radio" name="anreise" value="möchte mitfahren">
+        <span class="titel">Ich möchte mitfahren</span><span class="preis"></span><span class="zusatz">Ich suche einen Platz in einem Auto.</span></label>
+    </div>
+
+    <div class="summe"><span class="text">Vorauszahlung</span><span class="wert" id="summe">200,00 €</span></div>
+  </div>
+  <div class="hinweis" id="hinweis" hidden></div>
+
+  <label class="feld" for="anmerkung">Anmerkung <span>(freiwillig)</span></label>
+  <textarea id="anmerkung" maxlength="500" autocomplete="off"></textarea>
+
+  <button class="los" id="los" disabled>Anmeldung prüfen</button>
+  <p class="naechst">Danach siehst du deine Anmeldung mit der Vorauszahlung noch einmal und schickst sie ab.</p>
+  </section>
+
+  <section id="schritt-pruefen" hidden>
+    <h2>Deine Anmeldung</h2>
+    <p class="fuer2" id="pruefen-fuer"></p>
+    <table class="liste" id="liste"></table>
+    <p class="anm-anzeige" id="anm-anzeige" hidden></p>
+    <button class="los" id="abschicken">Anmeldung abschicken</button>
+    <button class="zurueck" id="zurueck">Zurück zur Anmeldung</button>
+    <div class="hinweis" id="fehler" hidden></div>
+    <a class="nichts" id="ersatz" href="#" hidden>Stattdessen per Mail an Hanspeter anmelden</a>
+  </section>
+
+  <section id="schritt-danke" hidden>
+    <h2 id="danke-titel">Danke!</h2>
+    <p id="danke-text"></p>
+    <table class="liste" id="danke-liste"></table>
+    <p class="naechst">Bis zum Anmeldeschluss am 28. November kannst du deinen Link aus der Mail noch einmal öffnen und deine Anmeldung ändern. Es gilt die letzte Anmeldung. Danach melde dich bitte direkt bei Hanspeter.</p>
+  </section>
+
+  <footer>Fragen zum Skimeeting beantwortet dir Hanspeter.</footer>
+</main>
+
+<script src="anmeldung.js"></script>
+<script>
+  // Google-Web-App „Skimeeting Anmeldung“ (Skimeeting Flachau/Google/Code.gs im Vault).
+  // Ist GOOGLE leer oder antwortet Google nicht, bietet die Seite die Anmeldung per Mail an.
+  const GOOGLE = "";
+  const MAIL = "hpm@meissl-peuerbach.at";
+
+  const euro = n => n.toLocaleString("de-AT", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+  // Persönlicher Link: ?m=Nr.%2018%20Meissl&n=Hanspeter
+  // m ist die Kennung für die Auswertung, n der Vorname für die Anrede.
+  const parameter = new URLSearchParams(location.search);
+  const mitglied = (parameter.get("m") || "").slice(0, 80);
+  const vorname = (parameter.get("n") || "").slice(0, 40);
+  if (vorname) {
+    const anrede = document.getElementById("anrede");
+    anrede.append("Lieber ", Object.assign(document.createElement("b"), { textContent: vorname }),
+                  ", hier kannst du dich für unser Skimeeting anmelden.");
+    anrede.hidden = false;
+  }
+  // Angezeigt wird der Name „Herbert Straßl“, die Kennung „Nr. 28 Straßl“ geht nur an die Web-App.
+  const anzeigename = `${vorname} ${mitglied.replace(/^Nr\.?\s*\d+\s+/, "")}`.trim();
+  if (mitglied) {
+    document.getElementById("mitglied").textContent = anzeigename;
+    document.getElementById("fuer").hidden = false;
+  }
+
+  const gruppe = name => [...document.querySelectorAll(`input[name="${name}"]`)];
+  const teilnahmeWahl = gruppe("teilnahme"), zimmerWahl = gruppe("zimmer"), anreiseWahl = gruppe("anreise");
+  const wert = liste => (liste.find(o => o.checked) || {}).value ?? null;
+  const setzen = (liste, w) => liste.forEach(o => { o.checked = o.value === w; });
+  const partner = document.getElementById("partner");
+  const plaetzeFeld = document.getElementById("plaetze");
+  const anmerkung = document.getElementById("anmerkung");
+
+  // Bestätigungslink für bereits Angemeldete: &t=1 wählt die bestehende Teilnahme vor.
+  // Zimmerwunsch und Anreise fehlen bei Anmeldungen laut Protokoll und werden hier nachgetragen.
+  const bestand = parameter.get("t");
+  if (["0", "1"].includes(bestand)) {
+    setzen(teilnahmeWahl, bestand);
+    const hinweis = document.getElementById("bestand");
+    hinweis.textContent = bestand === "0"
+      ? "Laut unserer Liste bist du diesmal nicht dabei."
+      : "Laut unserer Liste bist du angemeldet. Bitte ergänze noch deinen Zimmerwunsch und deine Anreise und schick die Anmeldung ab.";
+    hinweis.hidden = false;
+  }
+
+  // Die Eingabe als Objekt, so wie sie geprüft und verschickt wird.
+  function eingabe() {
+    const t = wert(teilnahmeWahl);
+    const teilnahme = t === null ? null : Number(t);
+    const dabei = teilnahme === 1;
+    const zimmer = dabei ? wert(zimmerWahl) : null;
+    const anreise = dabei ? wert(anreiseWahl) : null;
+    return {
+      teilnahme, zimmer, anreise,
+      partner: zimmer === "Doppelzimmer" ? partner.value.trim() : "",
+      plaetze: anreise === SELBST && plaetzeFeld.value !== "" ? Number(plaetzeFeld.value) : null,
+      anmerkung: anmerkung.value.trim(),
+    };
+  }
+
+  // Was noch fehlt, in der Reihenfolge der Seite.
+  function fehlt(e) {
+    if (e.teilnahme === null) return "";
+    if (e.teilnahme === 0) return "";
+    if (!e.zimmer) return "Bitte wähle deinen Zimmerwunsch.";
+    if (!e.anreise) return "Bitte wähle deine Anreise.";
+    if (e.anreise === SELBST && e.plaetze === null) return "Bitte wähle, für wie viele Personen du im Auto Platz hast.";
+    return "";
+  }
+
+  function rechnen() {
+    const e = eingabe();
+    document.getElementById("dabei").hidden = e.teilnahme !== 1;
+    document.getElementById("partner-feld").hidden = e.zimmer !== "Doppelzimmer";
+    document.getElementById("summe").textContent = euro(anmeldung(e.teilnahme ?? -1).betrag);
+    const text = fehlt(e);
+    const hinweis = document.getElementById("hinweis");
+    // Den Hinweis erst zeigen, wenn schon ein Teil der Fragen beantwortet ist.
+    hinweis.hidden = !text || (!e.zimmer && !e.anreise);
+    hinweis.textContent = text;
+    document.getElementById("los").disabled = e.teilnahme === null || !!text;
+    return e;
+  }
+  [...teilnahmeWahl, ...zimmerWahl, ...anreiseWahl].forEach(o => { o.onchange = rechnen; });
+  // Wer die Zahl der Plätze wählt, fährt selbst.
+  plaetzeFeld.onchange = () => { if (plaetzeFeld.value !== "") setzen(anreiseWahl, SELBST); rechnen(); };
+  partner.oninput = rechnen;
+
+  // Die Anmeldung für die Rückkehr mit der Zurück-Taste merken. Der Browser stellt Feldinhalte
+  // sonst erst nach dem ersten Rechnen wieder her.
+  const MERKER = "skimeeting-anmeldung";
+  function merken(e) {
+    try { sessionStorage.setItem(MERKER, JSON.stringify({ mitglied, ...e })); } catch (x) {}
+  }
+  function wiederherstellen() {
+    try {
+      const g = JSON.parse(sessionStorage.getItem(MERKER) || "null");
+      if (!g || g.mitglied !== mitglied) return;
+      setzen(teilnahmeWahl, g.teilnahme === null ? null : String(g.teilnahme));
+      setzen(zimmerWahl, g.zimmer);
+      setzen(anreiseWahl, g.anreise);
+      partner.value = g.partner || "";
+      plaetzeFeld.value = g.plaetze === null || g.plaetze === undefined ? "" : String(g.plaetze);
+      anmerkung.value = g.anmerkung || "";
+    } catch (x) {}
+  }
+
+  const schritte = ["schritt-anmelden", "schritt-pruefen", "schritt-danke"];
+  function zeige(id) {
+    schritte.forEach(s => { document.getElementById(s).hidden = s !== id; });
+    // Bild, Eckdaten und Regeln nur beim Anmelden, damit Prüfung und Dank oben stehen.
+    document.getElementById("einleitung").hidden = id !== "schritt-anmelden";
+    window.scrollTo(0, 0);
+  }
+
+  const zimmerText = e => e.zimmer === "Doppelzimmer" && e.partner ? `Doppelzimmer mit ${e.partner}` : e.zimmer;
+  const anreiseText = e => e.anreise === SELBST
+    ? `Ich fahre selbst und habe Platz für ${e.plaetze} ${e.plaetze === 1 ? "Person" : "Personen"}.`
+    : "Ich möchte mitfahren.";
+
+  function liste(tabelle, e) {
+    tabelle.replaceChildren();
+    const el = (tag, klasse, text) => Object.assign(document.createElement(tag), { className: klasse, textContent: text });
+    const zeile = (links, rechts, klasse) => {
+      const tr = tabelle.insertRow();
+      if (klasse) tr.className = klasse;
+      const a = tr.insertCell(), z = tr.insertCell();
+      a.append(...links);
+      z.className = "betrag";
+      z.textContent = rechts;
+    };
+    if (!e.teilnahme) {
+      zeile([el("div", "name", "Ich nehme nicht teil"), el("div", "weg", "Ich bin diesmal nicht dabei.")], "");
+      return;
+    }
+    zeile([el("div", "name", "Ich nehme teil"), el("div", "weg", anzeigename || vorname)], "");
+    zeile([el("div", "name", zimmerText(e)), el("div", "weg", "Zimmerwunsch, je nach Verfügbarkeit")], "");
+    zeile([el("div", "name", "Anreise"), el("div", "weg", anreiseText(e))], "");
+    zeile([el("span", "", "Vorauszahlung")], euro(anmeldung(1).betrag), "gesamt");
+  }
+
+  // Text für die Spalte Vorauszahlung und die Ersatzmail.
+  function zusammenfassung(e) {
+    if (!e.teilnahme) return "nehme nicht teil";
+    return `nehme teil, Zimmerwunsch: ${zimmerText(e)}, Anreise: ${anreiseText(e)} Vorauszahlung ${euro(anmeldung(1).betrag)}`;
+  }
+
+  let entwurf = null;  // die Anmeldung, die gerade geprüft wird
+  function pruefen() {
+    const e = rechnen();
+    if (e.teilnahme === null || fehlt(e)) return;
+    entwurf = e;
+    merken(entwurf);
+    document.getElementById("pruefen-fuer").textContent = mitglied ? `für ${anzeigename}` : "";
+    liste(document.getElementById("liste"), entwurf);
+    const anm = document.getElementById("anm-anzeige");
+    anm.hidden = !entwurf.anmerkung;
+    anm.textContent = entwurf.anmerkung ? `Anmerkung: ${entwurf.anmerkung}` : "";
+    const knopf = document.getElementById("abschicken");
+    knopf.textContent = entwurf.teilnahme ? "Anmeldung abschicken" : "Ohne Anmeldung abschließen";
+    knopf.disabled = false;
+    knopf.classList.remove("sendet");
+    document.getElementById("fehler").hidden = true;
+    document.getElementById("ersatz").hidden = true;
+    zeige("schritt-pruefen");
+    if (!mitglied) fehlschlag("Diese Seite wurde ohne deinen persönlichen Link geöffnet. Bitte nimm den Link aus deiner Mail oder melde dich per Mail bei Hanspeter an.");
+    else if (!GOOGLE) fehlschlag("Die Anmeldung über diese Seite ist gerade nicht möglich. Bitte melde dich per Mail bei Hanspeter an.");
+  }
+
+  function fehlschlag(text) {
+    const f = document.getElementById("fehler");
+    f.textContent = text;
+    f.hidden = false;
+    document.getElementById("ersatz").hidden = false;
+    const knopf = document.getElementById("abschicken");
+    knopf.disabled = !mitglied || !GOOGLE;
+    knopf.classList.remove("sendet");
+    if (mitglied && GOOGLE) knopf.textContent = "Noch einmal versuchen";
+  }
+
+  async function abschicken() {
+    const knopf = document.getElementById("abschicken");
+    if (knopf.disabled || !entwurf) return;
+    knopf.disabled = true;  // Sperre gleich am Klick, damit nichts doppelt ankommt
+    knopf.classList.add("sendet");
+    knopf.textContent = "Wird gesendet …";
+    document.getElementById("fehler").hidden = true;
+    const daten = { mitglied, teilnahme: entwurf.teilnahme, zimmer: entwurf.zimmer || "", partner: entwurf.partner,
+                    anreise: entwurf.anreise || "", plaetze: entwurf.plaetze ?? "",
+                    vorauszahlung: zusammenfassung(entwurf), anmerkung: entwurf.anmerkung };
+    const abbruch = new AbortController();
+    const uhr = setTimeout(() => abbruch.abort(), 25000);
+    try {
+      // Ohne eigenen Content-Type geht die Anfrage als einfacher Text, ohne Vorabfrage des Browsers.
+      const antwort = await fetch(GOOGLE, { method: "POST", body: JSON.stringify(daten), signal: abbruch.signal });
+      const ergebnis = await antwort.json();
+      if (!ergebnis.ok) throw new Error(ergebnis.fehler || "abgelehnt");
+      danke(entwurf);
+    } catch (e) {
+      fehlschlag("Die Anmeldung ist nicht angekommen. Bitte versuche es noch einmal oder melde dich per Mail bei Hanspeter an.");
+    } finally {
+      clearTimeout(uhr);
+    }
+  }
+
+  function danke(e) {
+    document.getElementById("danke-titel").textContent = vorname ? `Danke, ${vorname}!` : "Danke!";
+    document.getElementById("danke-text").textContent = e.teilnahme
+      ? `Deine Anmeldung zum Skimeeting in Flachau ist eingegangen. Die Vorauszahlung von ${euro(anmeldung(1).betrag)} bucht Christian nach dem Anmeldeschluss ab. Deinen Zimmerwunsch berücksichtigen wir je nach Verfügbarkeit.`
+      : "Wir haben vermerkt, dass du diesmal nicht dabei bist. Du bekommst keine Erinnerung.";
+    liste(document.getElementById("danke-liste"), e);
+    document.getElementById("danke-liste").hidden = !e.teilnahme;
+    zeige("schritt-danke");
+  }
+
+  function ersatzmail(ev) {
+    ev.preventDefault();
+    if (!entwurf) return;
+    const text = [`Hallo Hanspeter,`, ``, `hier meine Anmeldung zum Skimeeting in Flachau:`,
+                  zusammenfassung(entwurf), entwurf.anmerkung ? `Anmerkung: ${entwurf.anmerkung}` : "",
+                  ``, mitglied].filter((z, i, a) => z !== "" || a[i - 1] !== "").join("\n");
+    location.href = `mailto:${MAIL}?subject=${encodeURIComponent("Anmeldung Skimeeting Flachau")}&body=${encodeURIComponent(text)}`;
+  }
+
+  document.getElementById("los").onclick = pruefen;
+  document.getElementById("abschicken").onclick = abschicken;
+  document.getElementById("zurueck").onclick = () => zeige("schritt-anmelden");
+  document.getElementById("ersatz").onclick = ersatzmail;
+  wiederherstellen();
+  rechnen();
+  // Rückkehr aus dem Zwischenspeicher des Browsers: Merker einsetzen und neu rechnen.
+  window.addEventListener("pageshow", () => { wiederherstellen(); rechnen(); });
+</script>
+</body>
+</html>

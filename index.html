@@ -92,6 +92,7 @@
   .liste .weg { font-size: 13px; color: var(--grau); }
   .liste tr.gesamt td { border-top: 3px solid var(--navy); border-bottom: 0; font-size: 18px; font-weight: 700; color: var(--navy); }
   .bisher-zeile { background: var(--hell); border-left: 3px solid var(--navy); padding: 8px 12px; font-size: 14px; margin: 0 0 12px; }
+  a.zurueck { box-sizing: border-box; text-align: center; text-decoration: none; }
   .bisher-zeile a { color: var(--navy); font-weight: 700; }
   .offen-wert { color: var(--warn, #9A3412); }
   .anm-anzeige { font-size: 14px; color: var(--grau); background: var(--hell); padding: 10px 12px; border-radius: 6px; }
@@ -136,6 +137,7 @@
     <div class="hinweis" id="bisher-pruefen" hidden></div>
     <p id="bisher-text"></p>
     <button class="los" id="bisher-aendern">Anmeldung ändern</button>
+    <a class="zurueck" id="bisher-mail" href="#" hidden>Mail an Hanspeter</a>
   </section>
 
   <section id="schritt-anmelden">
@@ -461,7 +463,13 @@
       if (!ergebnis.ok) throw new Error(ergebnis.fehler || "abgelehnt");
       danke(entwurf);
     } catch (e) {
-      fehlschlag("Die Anmeldung ist nicht angekommen. Bitte versuche es noch einmal oder melde dich per Mail bei Hanspeter an.");
+      // Seite vor dem Anmeldeschluss geöffnet, danach abgeschickt: die Web-App lehnt ab.
+      if (e.message === "Anmeldeschluss vorbei") {
+        fehlschlag("Der Anmeldeschluss ist vorbei. Änderungen bitte direkt bei Hanspeter.");
+        document.getElementById("abschicken").disabled = true;
+      } else {
+        fehlschlag("Die Anmeldung ist nicht angekommen. Bitte versuche es noch einmal oder melde dich per Mail bei Hanspeter an.");
+      }
     } finally {
       clearTimeout(uhr);
     }
@@ -472,6 +480,12 @@
   // dann steht dort „noch offen“, und der Knopf heißt „Anmeldung ergänzen“. Anmeldungen laut Protokoll
   // oder mündlich kommen erst mit dem nächsten Abgleich vom PC dazu.
   let gesendet = false;
+  const MONATE = ["Jänner", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober",
+                  "November", "Dezember"];
+  const datumText = t => {
+    const m = String(t || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? `${Number(m[3])}. ${MONATE[Number(m[2]) - 1]} ${m[1]}` : "";
+  };
   const zeitText = t => {
     const m = String(t || "").match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})/);
     return m ? `${m[3]}.${m[2]}.${m[1]} um ${m[4]}:${m[5]}` : "";
@@ -507,24 +521,30 @@
     z.textContent = euro(anmeldung(1).betrag);
   }
 
+  // Nach dem Anmeldeschluss (die Web-App meldet „offen: false“) nur noch ansehen, ohne Knopf zum Ändern.
+  // Wer nie geantwortet hat, sieht dann statt des Formulars nur den Hinweis und „Mail an Hanspeter“.
   function bisherZeigen(b) {
     const dabei = b.status === "angemeldet", pruefen = b.status === "prüfen";
+    const vorbei = b.offen === false;
+    const ohne = !dabei && !pruefen && b.status !== "nicht dabei";
     const zeit = zeitText(b.zeit);
-    const vorbei = b.schluss && new Date() > new Date(String(b.schluss).replace(" ", "T"));
-    document.getElementById("bisher-titel").textContent = b.status === "nicht dabei" ? "Diesmal nicht dabei" : "Deine Anmeldung";
+    document.getElementById("bisher-titel").textContent = ohne ? "Anmeldeschluss vorbei"
+      : b.status === "nicht dabei" ? "Diesmal nicht dabei" : "Deine Anmeldung";
     document.getElementById("bisher-zeit").textContent = zeit
       ? `${b.status === "nicht dabei" ? "Vermerkt" : "Angemeldet"} am ${zeit}` : "";
     const tabelle = document.getElementById("bisher-liste");
-    tabelle.hidden = pruefen;
-    if (!pruefen) bisherListe(tabelle, b);
+    tabelle.hidden = pruefen || ohne;
+    if (!pruefen && !ohne) bisherListe(tabelle, b);
     const anm = document.getElementById("bisher-anm");
     anm.hidden = !b.anmerkung;
     anm.textContent = b.anmerkung ? `Anmerkung: ${b.anmerkung}` : "";
     const hinweis = document.getElementById("bisher-pruefen");
     hinweis.hidden = !pruefen;
     hinweis.textContent = "Deine Anmeldung ist eingegangen, muss aber noch geklärt werden. Hanspeter meldet sich bei dir.";
+    const schluss = datumText(b.schluss);
     document.getElementById("bisher-text").textContent = vorbei
-      ? "Der Anmeldeschluss ist vorbei. Änderungen bitte direkt bei Hanspeter."
+      ? (ohne ? `Der Anmeldeschluss war am ${schluss}. Wenn du noch dabei sein möchtest, melde dich bitte direkt bei Hanspeter.`
+              : `Der Anmeldeschluss war am ${schluss}. Änderungen bitte direkt bei Hanspeter.`)
       : dabei && !b.vollstaendig
         ? "Bitte ergänze noch, was offen ist, und schick die Anmeldung ab."
         : "Wenn sich nichts ändert, musst du nichts tun. Bis zum Anmeldeschluss am 28. November kannst du deine Anmeldung ändern, es gilt die letzte.";
@@ -549,6 +569,11 @@
       rechnen();
       zeige("schritt-anmelden");
     };
+    knopf.hidden = vorbei;
+    const mail = document.getElementById("bisher-mail");
+    mail.hidden = !vorbei;
+    mail.href = `mailto:${MAIL}?subject=${encodeURIComponent("Skimeeting Flachau: Änderung nach dem Anmeldeschluss")}`
+      + `&body=${encodeURIComponent(`Hallo Hanspeter,\n\n\n\n${mitglied}`)}`;
     zeige("schritt-bisher");
   }
 
@@ -560,8 +585,14 @@
     try {
       const antwort = await fetch(`${GOOGLE}?anmeldung=${encodeURIComponent(mitglied)}`, { signal: abbruch.signal });
       const b = await antwort.json();
+      if (gesendet || !b.ok) return zeileSetzen("");
+      // Nach dem Anmeldeschluss gibt es kein Formular mehr, auch nicht für die, die nie geantwortet haben.
+      if (b.offen === false) {
+        zeileSetzen("");
+        return bisherZeigen(b);
+      }
       // „offen“ oder eine Web-App ohne diesen Abruf liefern keinen der drei Fälle; dann bleibt das Formular.
-      if (gesendet || !b.ok || !["angemeldet", "nicht dabei", "prüfen"].includes(b.status)) return zeileSetzen("");
+      if (!["angemeldet", "nicht dabei", "prüfen"].includes(b.status)) return zeileSetzen("");
       document.getElementById("bestand").hidden = true;
       const link = Object.assign(document.createElement("a"), { href: "#", textContent: "Ansehen" });
       link.onclick = e => { e.preventDefault(); bisherZeigen(b); };

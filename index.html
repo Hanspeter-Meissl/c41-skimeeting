@@ -580,11 +580,7 @@
     hinweis.hidden = !pruefen;
     hinweis.textContent = "Deine Anmeldung ist eingegangen, muss aber noch geklärt werden. Hanspeter meldet sich bei dir.";
     const schluss = datumText(b.schluss);
-    document.getElementById("bisher-text").textContent = verwaltung
-      ? (ohne ? "Noch keine Antwort. „Neu anmelden“ trägt eine Anmeldung ein."
-              : dabei && !b.vollstaendig ? "Es fehlen noch Angaben. „Anmeldung ergänzen“ trägt sie ein, es gilt die letzte."
-              : "„Anmeldung ändern“ trägt eine neue Anmeldung ein, es gilt die letzte.")
-      : vorbei
+    document.getElementById("bisher-text").textContent = vorbei
       ? (ohne ? `Der Anmeldeschluss war am ${schluss}. Wenn du noch dabei sein möchtest, melde dich bitte direkt bei Hanspeter.`
               : `Der Anmeldeschluss war am ${schluss}. Änderungen bitte direkt bei Hanspeter.`)
       : dabei && !b.vollstaendig
@@ -595,6 +591,8 @@
     const knopf = document.getElementById("bisher-aendern");
     knopf.textContent = dabei ? (b.vollstaendig ? "Anmeldung ändern" : "Anmeldung ergänzen")
       : b.status === "nicht dabei" ? "Doch anmelden" : "Neu anmelden";
+    // Der Hinweis für die Verwaltung nennt den Knopf, den sie wirklich sieht.
+    if (verwaltung) document.getElementById("bisher-text").textContent = `„${knopf.textContent}“ trägt eine neue Anmeldung ein, es gilt die letzte.`;
     knopf.onclick = () => {
       // Ändern beginnt bei der geltenden Anmeldung; „Doch anmelden“ und „Neu anmelden“ bei einer leeren Auswahl.
       if (dabei) {

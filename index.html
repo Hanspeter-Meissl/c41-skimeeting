@@ -114,6 +114,10 @@
   @keyframes drehen { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .laden .rad { animation-duration: 3s; } }
   .laden p { margin: 0; font-weight: 600; color: var(--navy); }
+  /* Eintrag durch die Verwaltung in der Club-41-App (seit 10. November 2026) */
+  .verwaltung { margin: 0 0 16px; padding: 10px 14px; border-radius: 10px; background: #FFF4CC;
+                border: 1px solid #E6C65C; color: #4A3B00; font-size: 15px; line-height: 1.4; }
+  .verwaltung b { color: #2B2200; }
 </style>
 <script>
   // Seit 29. Oktober 2026: Mit persönlichem Link liegt die Ladeanzeige schon beim ersten Zeichnen über der Seite,
@@ -134,6 +138,7 @@
   </header>
 
   <h1>Skimeeting in Flachau</h1>
+  <div class="verwaltung" id="verwaltung" role="status" hidden></div>
   <p class="anrede" id="anrede" hidden></p>
   <p class="fuer" id="fuer" hidden>Anmeldung für <b id="mitglied"></b></p>
   <div id="einleitung">
@@ -265,6 +270,11 @@
   const parameter = new URLSearchParams(location.search);
   const mitglied = (parameter.get("m") || "").slice(0, 80);
   const vorname = (parameter.get("n") || "").slice(0, 40);
+  // Eintrag durch die Verwaltung: &a=<Ausweis> aus der Club-41-App. Ob er gilt, sagt erst die Web-App; bis dahin
+  // verhält sich die Seite wie beim Mitglied. Gilt er, ist der Anmeldeschluss aufgehoben, und die Zeile in der
+  // Tabelle trägt die Quelle „Verwaltung“.
+  const ausweis = (parameter.get("a") || "").slice(0, 80);
+  let verwaltung = null;
   if (vorname) {
     const anrede = document.getElementById("anrede");
     anrede.append("Lieber ", Object.assign(document.createElement("b"), { textContent: vorname }),
@@ -478,6 +488,7 @@
                     zimmer: entwurf.zimmer || "", partner: entwurf.partner,
                     anreise: entwurf.anreise || "", plaetze: entwurf.plaetze ?? "",
                     vorauszahlung: zusammenfassung(entwurf), anmerkung: entwurf.anmerkung };
+    if (verwaltung) daten.ausweis = ausweis;
     const abbruch = new AbortController();
     const uhr = setTimeout(() => abbruch.abort(), 25000);
     try {
@@ -490,6 +501,9 @@
       // Seite vor dem Anmeldeschluss geöffnet, danach abgeschickt: die Web-App lehnt ab.
       if (e.message === "Anmeldeschluss vorbei") {
         fehlschlag("Der Anmeldeschluss ist vorbei. Änderungen bitte direkt bei Hanspeter.");
+        document.getElementById("abschicken").disabled = true;
+      } else if (e.message === "Ausweis ungültig") {
+        fehlschlag("Der Zugang der Verwaltung ist abgelaufen. Bitte die Anmeldung in der App neu öffnen.");
         document.getElementById("abschicken").disabled = true;
       } else {
         fehlschlag("Die Anmeldung ist nicht angekommen. Bitte versuche es noch einmal oder melde dich per Mail bei Hanspeter an.");
@@ -566,12 +580,18 @@
     hinweis.hidden = !pruefen;
     hinweis.textContent = "Deine Anmeldung ist eingegangen, muss aber noch geklärt werden. Hanspeter meldet sich bei dir.";
     const schluss = datumText(b.schluss);
-    document.getElementById("bisher-text").textContent = vorbei
+    document.getElementById("bisher-text").textContent = verwaltung
+      ? (ohne ? "Noch keine Antwort. „Neu anmelden“ trägt eine Anmeldung ein."
+              : dabei && !b.vollstaendig ? "Es fehlen noch Angaben. „Anmeldung ergänzen“ trägt sie ein, es gilt die letzte."
+              : "„Anmeldung ändern“ trägt eine neue Anmeldung ein, es gilt die letzte.")
+      : vorbei
       ? (ohne ? `Der Anmeldeschluss war am ${schluss}. Wenn du noch dabei sein möchtest, melde dich bitte direkt bei Hanspeter.`
               : `Der Anmeldeschluss war am ${schluss}. Änderungen bitte direkt bei Hanspeter.`)
       : dabei && !b.vollstaendig
         ? "Bitte ergänze noch, was offen ist, und schick die Anmeldung ab."
         : "Wenn sich nichts ändert, musst du nichts tun. Bis zum Anmeldeschluss am 28. November kannst du deine Anmeldung ändern, es gilt die letzte.";
+    if (verwaltung) document.getElementById("bisher-titel").textContent = ohne ? "Noch keine Antwort"
+      : b.status === "nicht dabei" ? "Nicht dabei" : pruefen ? "Anmeldung zu klären" : "Geltende Anmeldung";
     const knopf = document.getElementById("bisher-aendern");
     knopf.textContent = dabei ? (b.vollstaendig ? "Anmeldung ändern" : "Anmeldung ergänzen")
       : b.status === "nicht dabei" ? "Doch anmelden" : "Neu anmelden";
@@ -612,9 +632,16 @@
     const abbruch = new AbortController();
     const uhr = setTimeout(() => abbruch.abort(), 20000);
     try {
-      const antwort = await fetch(`${GOOGLE}?anmeldung=${encodeURIComponent(mitglied)}`, { signal: abbruch.signal });
+      const antwort = await fetch(`${GOOGLE}?anmeldung=${encodeURIComponent(mitglied)}`
+        + (ausweis ? `&ausweis=${encodeURIComponent(ausweis)}` : ""), { signal: abbruch.signal });
       const b = await antwort.json();
       if (gesendet || !b.ok) return zeileSetzen("");
+      if (ausweis) verwaltungZeigen(b);
+      // Die Verwaltung beginnt immer bei der Übersicht der geltenden Anmeldung.
+      if (verwaltung) {
+        zeileSetzen("");
+        return bisherZeigen(b);
+      }
       // Nach dem Anmeldeschluss gibt es kein Formular mehr, auch nicht für die, die nie geantwortet haben.
       if (b.offen === false) {
         zeileSetzen("");
@@ -638,12 +665,37 @@
     }
   }
 
+  // Balken für die Verwaltung. Ein abgelaufener oder fremder Ausweis zeigt nur den Hinweis, die Seite bleibt
+  // dann so, wie das Mitglied sie nach dem Anmeldeschluss sieht.
+  function verwaltungZeigen(b) {
+    const balken = document.getElementById("verwaltung");
+    verwaltung = b.verwaltung || null;
+    if (verwaltung) {
+      balken.replaceChildren("Eintrag durch die Verwaltung (", verwaltung.von, ") für ",
+        Object.assign(document.createElement("b"), { textContent: anzeigename }),
+        `. Der Anmeldeschluss gilt hier nicht, eintragen bis ${datumText(verwaltung.ende)}.`);
+      document.getElementById("anrede").hidden = true;
+    } else {
+      balken.textContent = "Der Zugang der Verwaltung ist abgelaufen. Bitte die Anmeldung in der App neu öffnen.";
+    }
+    balken.hidden = false;
+  }
+
   function danke(e) {
     gesendet = true;
     // Abgeschickt ist abgeschickt: Beim nächsten Öffnen zeigt die Seite die Anmeldung von der Web-App.
     try { sessionStorage.removeItem(MERKER); } catch (x) {}
-    document.getElementById("danke-titel").textContent = vorname ? `Danke, ${vorname}!` : "Danke!";
-    document.getElementById("danke-text").textContent = e.teilnahme
+    document.getElementById("danke-titel").textContent = verwaltung ? "Eingetragen" : vorname ? `Danke, ${vorname}!` : "Danke!";
+    document.querySelector("#schritt-danke .naechst").hidden = !!verwaltung;
+    // Die Verwaltung der Club-41-App öffnet die Seite in einem eigenen Rahmen und wartet auf diese Nachricht,
+    // um den Stand neu zu laden und die Bestätigung an das Mitglied zu schicken.
+    if (verwaltung && window.parent !== window) {
+      window.parent.postMessage({ c41: "vorhaben-eingetragen", vorhaben: "skimeeting", mitglied }, "*");
+    }
+    document.getElementById("danke-text").textContent = verwaltung
+      ? (e.teilnahme ? `Die Anmeldung für ${anzeigename} ist eingetragen, Vorauszahlung ${euro(anmeldung(1).betrag)}.`
+                     : `Für ${anzeigename} ist vermerkt: diesmal nicht dabei.`)
+      : e.teilnahme
       ? `Deine Anmeldung zum Skimeeting in Flachau ist eingegangen. Die Vorauszahlung von ${euro(anmeldung(1).betrag)} bucht Christian nach dem Anmeldeschluss ab. Deinen Zimmerwunsch berücksichtigen wir je nach Verfügbarkeit.`
       : "Wir haben vermerkt, dass du diesmal nicht dabei bist. Du bekommst keine Erinnerung.";
     liste(document.getElementById("danke-liste"), e);

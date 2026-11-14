@@ -1,7 +1,7 @@
 # Anmeldeseite Skimeeting Flachau, Club 41
 
 Anmeldung zum Skimeeting in Flachau (10. bis 13. Jänner 2027, Quartier Reslwirt) für die Mitglieder
-des Club 41 Grieskirchen-Hausruck. Veröffentlicht über GitHub Pages, gebaut nach dem Muster der
+des Club 41 Grieskirchen. Veröffentlicht über GitHub Pages, gebaut nach dem Muster der
 Filzmoos-Anmeldung `c41-filzmoos`.
 
 Nur Mitglieder fahren mit, eine Begleitung gibt es nicht. Das Mitglied wählt „Ich nehme teil“ oder
